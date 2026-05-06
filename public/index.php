@@ -38,7 +38,7 @@ try {
     
     // URLROOT: URL gốc của ứng dụng (bao gồm /public)
     // 🔥 QUAN TRỌNG: Phải có /public ở cuối vì file index.php nằm trong /public
-    define('URLROOT', 'http://localhost/PHPnhom/chat-app-php-mvc/public');
+    define('URLROOT', 'http://localhost/chat-app-php-mvc/public');
     
     // ============================================
     // BƯỚC 4: AUTOLOADER
@@ -46,18 +46,18 @@ try {
     // Tự động load các class khi được gọi
     // Tìm kiếm trong các thư mục: core, models, controllers, repositories, decorators, traits
     spl_autoload_register(function ($class) {
+        // Hỗ trợ namespace: App\Models\User → lấy 'User'
+        $parts     = explode('\\', $class);
+        $className = end($parts);
+
         $dirs = ['core', 'models', 'controllers', 'repositories', 'decorators', 'traits'];
-        
         foreach ($dirs as $dir) {
-            $file = BASE_PATH . "/app/$dir/$class.php";
-            
+            $file = BASE_PATH . "/app/$dir/$className.php";
             if (file_exists($file)) {
                 require_once $file;
-                return; // Tìm thấy và load xong, thoát khỏi vòng lặp
+                return;
             }
         }
-        
-        // Nếu không tìm thấy class, throw exception
         throw new Exception("AUTOLOADER: Không tìm thấy class '$class'");
     });
     

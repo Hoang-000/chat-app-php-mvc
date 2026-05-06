@@ -149,15 +149,7 @@ class ChatController extends Controller
             // ============================================
             // Lấy 50 tin nhắn gần nhất của phòng
             // Tin nhắn được sắp xếp theo thời gian (cũ -> mới)
-            $messages = $this->messageRepository->getMessagesByRoom($roomId, 50);
-
-            // ============================================
-            // BƯỚC 8: ÁP DỤNG DECORATOR PATTERN
-            // ============================================
-            // Decorator Pattern: Thêm tính năng cho tin nhắn mà không sửa code gốc
-            // Chain: Raw Message → EmojiDecorator → MentionDecorator
-            // - EmojiDecorator: Chuyển :) thành 😊
-            // - MentionDecorator: Chuyển @username thành link
+            $messages          = $this->messageRepository->findByRoom($roomId, 50);
             $decoratedMessages = $this->decorateMessages($messages);
 
             // ============================================
@@ -205,49 +197,32 @@ class ChatController extends Controller
      */
     private function decorateMessages(array $messages): array
     {
-        $decorated = [];
+        $emojiDecorator   = new EmojiDecorator();
+        $mentionDecorator = new MentionDecorator();
 
+        $result = [];
         foreach ($messages as $msg) {
-            // Tạo adapter từ raw data (anonymous class)
-            $baseMessage = new class($msg) implements MessageDecorator {
-                private array $data;
-
-                public function __construct(array $data)
-                {
-                    $this->data = $data;
-                }
-
-                public function getContent(): string
-                {
-                    return $this->data['content'] ?? '';
-                }
-
-                public function getId(): int
-                {
-                    return (int)($this->data['id'] ?? 0);
-                }
-
-                public function getUserId(): int
-                {
-                    return (int)($this->data['sender_id'] ?? 0);
-                }
-
-                public function getCreatedAt(): string
-                {
-                    return $this->data['sent_at'] ?? '';
-                }
-
-                public function getType(): string
-                {
-                    return $this->data['type'] ?? 'text';
-                }
-            };
-
-            // Áp dụng chain of decorators
-            $decorated[] = new MentionDecorator(new EmojiDecorator($baseMessage));
+            // ✅ CHAIN: Raw → Emoji → Mention (ĐÚNG THEO ĐỀ BÀI)
+            $content = $msg->getContent();
+            
+            // Bước 1: Áp dụng EmojiDecorator
+            $tempMsg1 = new TextMessage($msg->getId(), $msg->getSender(), $content, $msg->getSentAt());
+            $content = $emojiDecorator->decorate($tempMsg1);
+            
+            // Bước 2: Áp dụng MentionDecorator
+            $tempMsg2 = new TextMessage($msg->getId(), $msg->getSender(), $content, $msg->getSentAt());
+            $content = $mentionDecorator->decorate($tempMsg2);
+            
+            $result[] = [
+                'id'        => $msg->getId(),
+                'sender_id' => $msg->getSender()->getId(),
+                'username'  => $msg->getSender()->getName(),
+                'content'   => $content, // ✅ Đã qua 2 decorator
+                'type'      => $msg->getType(),
+                'sent_at'   => $msg->getSentAt()->format('Y-m-d H:i:s'),
+            ];
         }
-
-        return $decorated;
+        return $result;
     }
 
     /**
@@ -399,7 +374,19 @@ class ChatController extends Controller
             // ============================================
             $this->log('SEND_BEFORE_SAVE', 'Chuẩn bị lưu tin nhắn vào database');
 
-            // Gọi repository để lưu tin nhắn với type
+            // Dùng ChatRoom->broadcast() đúng yêu cầu cô
+            $sender   = new User($senderId, '');
+            $chatRoom = new ChatRoom();
+            $chatRoom->join($sender);
+
+            if ($messageType === 'text') {
+                $msgObj = new TextMessage(0, $sender, $content);
+            } else {
+                $msgObj = new FileMessage(0, $sender, $content, $messageType);
+            }
+            $chatRoom->broadcast($msgObj);
+
+            // Lưu vào database
             $messageId = $this->messageRepository->saveMessage($roomId, $senderId, $content, $messageType);
 
             $this->log('SEND_AFTER_SAVE', "Tin nhắn đã được lưu với ID: {$messageId}");
@@ -955,25 +942,21 @@ class ChatController extends Controller
             $members = $this->roomRepository->getRoomMembers($roomId);
             $memberCount = count($members);
 
-            // ============================================
             // BƯỚC 5: LẤY TIN NHẮN CỦA PHÒNG
-            // ============================================
-            $messages = $this->messageRepository->getMessagesByRoom($roomId, 50);
+            $messages = $this->messageRepository->findByRoom($roomId, 50);
 
-            // ============================================
-            // BƯỚC 6: FORMAT TIN NHẮN
-            // ============================================
+            // BƯỚC 6: FORMAT TIN NHẮN TỪ OBJECTS
             $formattedMessages = [];
             foreach ($messages as $msg) {
                 $formattedMessages[] = [
-                    'id' => (int)$msg['id'],
-                    'room_id' => (int)$msg['room_id'],
-                    'sender_id' => (int)$msg['sender_id'],
-                    'username' => $msg['username'] ?? 'Unknown',
-                    'content' => $msg['content'],
-                    'type' => $msg['type'] ?? 'text',
-                    'sent_at' => $msg['sent_at'],
-                    'is_me' => ((int)$msg['sender_id'] === $currentUserId)
+                    'id'        => $msg->getId(),
+                    'room_id'   => $roomId,
+                    'sender_id' => $msg->getSender()->getId(),
+                    'username'  => $msg->getSender()->getName(),
+                    'content'   => $msg->getContent(),
+                    'type'      => $msg->getType(),
+                    'sent_at'   => $msg->getSentAt()->format('Y-m-d H:i:s'),
+                    'is_me'     => ($msg->getSender()->getId() === $currentUserId)
                 ];
             }
 
@@ -1308,16 +1291,31 @@ class ChatController extends Controller
             }
 
             $currentUserId = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
-            $roomName = isset($input['room_name']) ? trim($input['room_name']) : '';
-            $type = isset($input['type']) ? trim($input['type']) : 'group';
-            $targetUserId = isset($input['target_user_id']) ? (int)$input['target_user_id'] : 0;
+            $roomName      = isset($input['room_name']) ? trim($input['room_name']) : '';
+            $type          = isset($input['type']) ? trim($input['type']) : 'group';
+            $targetUserId  = isset($input['target_user_id']) ? (int)$input['target_user_id'] : 0;
 
-            $this->log('CREATE_ROOM_REQUEST', "User={$currentUserId}, Name={$roomName}, Type={$type}, Target={$targetUserId}");
+            // Lấy member_ids nếu có (dạng chuỗi "2,3,4" hoặc mảng)
+            $memberIds = [];
+            if (!empty($input['member_ids'])) {
+                if (is_array($input['member_ids'])) {
+                    $memberIds = array_map('intval', $input['member_ids']);
+                } else {
+                    // Tách chuỗi "2,3,4" thành mảng [2, 3, 4]
+                    $memberIds = array_filter(
+                        array_map('intval', explode(',', $input['member_ids']))
+                    );
+                }
+                // Loại bỏ giá trị <= 0
+                $memberIds = array_values(array_filter($memberIds, fn($id) => $id > 0));
+            }
+
+            $this->log('CREATE_ROOM_REQUEST', "User={$currentUserId}, Name={$roomName}, Type={$type}, Members=" . implode(',', $memberIds));
 
             // Validate
             $errors = [];
             if ($currentUserId <= 0) $errors[] = 'User ID không hợp lệ';
-            if (empty($roomName)) $errors[] = 'Tên phòng không được rỗng';
+            if (empty($roomName))    $errors[] = 'Tên phòng không được rỗng';
             if (!in_array($type, ['private', 'group'])) $errors[] = 'Loại phòng không hợp lệ';
 
             if (!empty($errors)) {
@@ -1326,33 +1324,29 @@ class ChatController extends Controller
                 exit;
             }
 
-            // ============================================
-            // LOGIC PRIVATE CHAT 1-1: KIỂM TRA PHÒNG ĐÃ TỒN TẠI
-            // ============================================
             if ($type === 'private' && $targetUserId > 0) {
+                // Chat 1-1
                 $existingRoomId = $this->roomRepository->findPrivateRoom($currentUserId, $targetUserId);
-                
                 if ($existingRoomId) {
-                    $this->log('PRIVATE_ROOM_EXISTS', "Phòng 1-1 đã tồn tại: {$existingRoomId}");
-                    
                     http_response_code(200);
-                    echo json_encode([
-                        'status' => 'success',
-                        'room_id' => $existingRoomId,
-                        'message' => 'Đã tìm thấy đoạn chat',
-                        'is_existing' => true
-                    ], JSON_UNESCAPED_UNICODE);
+                    echo json_encode(['status' => 'success', 'room_id' => $existingRoomId, 'message' => 'Đã tìm thấy đoạn chat', 'is_existing' => true], JSON_UNESCAPED_UNICODE);
                     exit;
                 }
-                
-                // Tạo phòng mới với 2 thành viên
                 $newRoomId = $this->roomRepository->createPrivateRoom($roomName, $currentUserId, $targetUserId);
             } else {
-                // Tạo phòng group bình thường
+                // Tạo nhóm
                 $newRoomId = $this->roomRepository->create($roomName, $type, $currentUserId);
+
+                // Thêm các thành viên khác nếu có member_ids
+                foreach ($memberIds as $memberId) {
+                    if ($memberId !== $currentUserId) {
+                        $this->roomRepository->addMemberToRoom($newRoomId, $memberId);
+                        $this->log('ADD_MEMBER', "Thêm user {$memberId} vào phòng {$newRoomId}");
+                    }
+                }
             }
 
-            $this->log('CREATE_ROOM_SUCCESS', "Phòng {$newRoomId} đã được tạo");
+            $this->log('CREATE_ROOM_SUCCESS', "Phòng {$newRoomId} đã được tạo với " . (count($memberIds) + 1) . " thành viên");
 
             http_response_code(200);
             echo json_encode(['status' => 'success', 'room_id' => $newRoomId, 'message' => 'Tạo phòng thành công'], JSON_UNESCAPED_UNICODE);
@@ -1599,6 +1593,122 @@ class ChatController extends Controller
             $this->log('ADD_MEMBER_ERROR', $e->getMessage());
             http_response_code(500);
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+    }
+
+    /**
+     * ============================================
+     * ACTION: convertEmoji - SỬ DỤNG EmojiDecorator.php
+     * ============================================
+     * API endpoint để chuyển đổi emoji text sang Unicode
+     * Sử dụng EmojiDecorator.php để xử lý
+     * 
+     * MỤC ĐÍCH:
+     * - Frontend gọi API này để chuyển đổi :) → 😊
+     * - Sử dụng đúng file EmojiDecorator.php theo yêu cầu
+     * - Đảm bảo logic chuyển đổi đồng nhất giữa frontend và backend
+     * 
+     * LUỒNG HOẠT ĐỘNG:
+     * 1. Frontend gửi POST request với content chứa emoji text
+     * 2. Controller tạo TextMessage object
+     * 3. Gọi EmojiDecorator->decorate() để chuyển đổi
+     * 4. Trả về JSON với content đã chuyển đổi
+     * 
+     * REQUEST FORMAT:
+     * - Method: POST
+     * - Body: {"content": "Hello :) How are you? :heart:"}
+     * 
+     * RESPONSE FORMAT:
+     * - Success: {"status": "success", "data": {"original": "...", "converted": "..."}}
+     * 
+     * @return void
+     */
+    public function convertEmoji(): void
+    {
+        // Xóa output buffer
+        if (ob_get_level() > 0) {
+            ob_clean();
+        }
+        
+        // Set header JSON
+        header('Content-Type: application/json; charset=utf-8');
+
+        try {
+            // ============================================
+            // BƯỚC 1: LẤY DỮ LIỆU TỪ REQUEST
+            // ============================================
+            $input = $_POST;
+            if (empty($input)) {
+                $rawInput = file_get_contents('php://input');
+                $input = json_decode($rawInput, true) ?? [];
+            }
+
+            $content = isset($input['content']) ? trim($input['content']) : '';
+
+            // Validate
+            if (empty($content)) {
+                throw new \InvalidArgumentException('Content không được rỗng');
+            }
+
+            $this->log('CONVERT_EMOJI_REQUEST', "Content: {$content}");
+
+            // ============================================
+            // BƯỚC 2: TẠO TextMessage OBJECT
+            // ============================================
+            // Tạo dummy user và message để sử dụng EmojiDecorator
+            $dummyUser = new User(0, 'System');
+            $message = new TextMessage(0, $dummyUser, $content);
+
+            // ============================================
+            // BƯỚC 3: SỬ DỤNG EmojiDecorator.php
+            // ============================================
+            $emojiDecorator = new EmojiDecorator();
+            $convertedContent = $emojiDecorator->decorate($message);
+
+            $this->log('CONVERT_EMOJI_SUCCESS', "Converted: {$convertedContent}");
+
+            // ============================================
+            // BƯỚC 4: TRẢ VỀ JSON
+            // ============================================
+            http_response_code(200);
+            
+            echo json_encode([
+                'status' => 'success',
+                'data' => [
+                    'original' => $content,
+                    'converted' => $convertedContent
+                ],
+                'message' => 'Chuyển đổi emoji thành công'
+            ], JSON_UNESCAPED_UNICODE);
+            
+            exit;
+
+        } catch (\InvalidArgumentException $e) {
+            $this->log('CONVERT_EMOJI_VALIDATION_ERROR', $e->getMessage());
+            
+            http_response_code(400);
+            
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'code' => 'VALIDATION_ERROR'
+            ], JSON_UNESCAPED_UNICODE);
+            
+            exit;
+
+        } catch (\Throwable $e) {
+            $this->log('CONVERT_EMOJI_ERROR', $e->getMessage());
+            
+            http_response_code(500);
+            
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Không thể chuyển đổi emoji',
+                'code' => 'RUNTIME_ERROR',
+                'details' => $e->getMessage()
+            ], JSON_UNESCAPED_UNICODE);
+            
             exit;
         }
     }

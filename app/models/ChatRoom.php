@@ -1,31 +1,38 @@
 <?php
-namespace App\Models;
 
-use RuntimeException;
-
-class ChatRoom {
-    private array $members = [];
+class ChatRoom
+{
+    private array $members  = [];
     private array $messages = [];
 
-    public function join(User $user): void {
+    public function join(BaseUser $user): void
+    {
         $this->members[$user->getId()] = $user;
     }
 
-    public function leave(User $user): void {
+    public function leave(BaseUser $user): void
+    {
         unset($this->members[$user->getId()]);
     }
 
-    public function broadcast(BaseMessage $msg): void {
+    public function broadcast(BaseMessage $msg): void
+    {
         $senderId = $msg->getSender()->getId();
 
         if (!isset($this->members[$senderId])) {
-            throw new RuntimeException("User ID {$senderId} is not in this room!");
+            throw new \RuntimeException("User ID {$senderId} is not in this room!");
         }
 
         $this->messages[] = $msg;
     }
 
-    public function getMessages(): array {
+    public function getMessages(): array
+    {
         return $this->messages;
+    }
+
+    public function getMembers(): array
+    {
+        return $this->members;
     }
 }

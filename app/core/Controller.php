@@ -17,6 +17,8 @@ class Controller
      */
     protected function view(string $view, array $data = []): void
     {
+        // extract tạo biến riêng lẻ: $roomId, $rooms, $messages...
+        // đồng thời giữ nguyên $data để view có thể dùng cả 2 cách
         extract($data);
 
         $viewFile = BASE_PATH . '/app/views/' . $view . '.php';

@@ -1,6 +1,5 @@
 <?php
-// Giả lập người đang đăng nhập
-$currentUserId = 1;
+$currentUserId = $data['currentUserId'] ?? 1;
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -160,35 +159,31 @@ $currentUserId = 1;
                     </div>
                 <?php else: ?>
                     <?php foreach ($data['messages'] as $msg): ?>
-                        <?php 
-                        // Kiểm tra tin nhắn của mình hay người khác
-                        $isMyMessage = ($msg->getUserId() == $currentUserId);
+                        <?php
+                        $isMyMessage  = ((int)$msg['sender_id'] === (int)$currentUserId);
                         $messageClass = $isMyMessage ? 'my-message' : 'other-message';
-                        $messageType = $msg->getType();
+                        $messageType  = $msg['type'] ?? 'text';
+                        $senderName   = $isMyMessage ? 'You' : ($msg['username'] ?? 'User #' . $msg['sender_id']);
                         ?>
-                        <div class="message-wrapper <?= $messageClass ?>" data-message-id="<?= $msg->getId() ?>" data-user-id="<?= $msg->getUserId() ?>">
-                            <div class="message-avatar">
-                                <img src="<?= $data['URLROOT'] ?>/images/avatar-default.png" 
-                                     alt="User <?= $msg->getUserId() ?>" 
-                                     onerror="this.style.display='none'; this.parentElement.textContent='<?= $isMyMessage ? 'Y' : 'U' . $msg->getUserId() ?>';">
-                            </div>
+                        <div class="message-wrapper <?= $messageClass ?>" data-message-id="<?= $msg['id'] ?>" data-user-id="<?= $msg['sender_id'] ?>">
+                            <div class="message-avatar"><?= htmlspecialchars(mb_substr($senderName, 0, 1)) ?></div>
                             <div class="message-content">
-                                <div class="message-sender"><?= $isMyMessage ? 'You' : 'User #' . $msg->getUserId() ?></div>
+                                <div class="message-sender"><?= htmlspecialchars($senderName) ?></div>
                                 <div class="message-bubble">
                                     <div class="message-text">
-                                        <?php if ($msg->getType() === 'image'): ?>
-                                            <img src="<?= $data['URLROOT'] ?>/<?= htmlspecialchars($msg->getContent()) ?>" style="max-width: 200px; border-radius: 8px; margin: 5px 0;" alt="Image">
-                                        <?php elseif ($msg->getType() === 'file'): ?>
-                                            <?php $fileName = basename($msg->getContent()); ?>
-                                            <a href="<?= $data['URLROOT'] ?>/<?= htmlspecialchars($msg->getContent()) ?>" target="_blank" class="message-file">
+                                        <?php if ($messageType === 'image'): ?>
+                                            <img src="<?= $data['URLROOT'] ?>/<?= htmlspecialchars($msg['content']) ?>" style="max-width: 200px; border-radius: 8px; margin: 5px 0;" alt="Image">
+                                        <?php elseif ($messageType === 'file'): ?>
+                                            <?php $fileName = basename($msg['content']); ?>
+                                            <a href="<?= $data['URLROOT'] ?>/<?= htmlspecialchars($msg['content']) ?>" target="_blank" class="message-file">
                                                 <i class="fas fa-file"></i> <?= htmlspecialchars($fileName) ?>
                                             </a>
                                         <?php else: ?>
-                                            <?= htmlspecialchars($msg->getContent()) ?>
+                                            <?= $msg['content'] ?>
                                         <?php endif; ?>
                                     </div>
                                     <div class="message-time">
-                                        <?= htmlspecialchars($msg->getCreatedAt()) ?>
+                                        <?= htmlspecialchars($msg['sent_at']) ?>
                                     </div>
                                 </div>
                             </div>

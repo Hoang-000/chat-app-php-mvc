@@ -5,7 +5,7 @@
  */
 
 // Fallback cho URLROOT
-window.URLROOT = window.URLROOT || 'http://localhost/PHPnhom/chat-app-php-mvc/public';
+window.URLROOT = window.URLROOT || 'http://localhost/chat-app-php-mvc/public';
 
 class ChatApplication {
     constructor() {
@@ -20,6 +20,23 @@ class ChatApplication {
         this.elements = {};
         this.isSending = false;
         this.pendingFiles = [];
+        
+        // ============================================
+        // EMOJI MAP - ĐỒNG BỘ VỚI EmojiDecorator.php
+        // ============================================
+        this.emojiMap = {
+            ':)': '😊', ':-)': '😊', ':D': '😃', ':-D': '😃',
+            ':(': '😞', ':-(': '😞', ':P': '😛', ':-P': '😛',
+            ';)': '😉', ';-)': '😉', ':O': '😮', ':-O': '😮',
+            ':*': '😘', 'B)': '😎',
+            ':happy:': '🎉', ':heart:': '❤️', ':love:': '❤️',
+            ':fire:': '🔥', ':star:': '⭐', ':thumbs:': '👍',
+            ':ok:': '👍', ':clap:': '👏', ':sad:': '😢',
+            ':cry:': '😭', ':laugh:': '😂', ':smile:': '😊',
+            ':cool:': '😎', ':wave:': '👋', ':check:': '✅',
+            ':cross:': '❌', ':warning:': '⚠️', ':rocket:': '🚀',
+            ':cake:': '🎂', ':gift:': '🎁'
+        };
         
         // Biến quản lý Polling
         this.lastMessageId = 0;      // ID tin nhắn cuối cùng (sẽ lấy từ HTML khi load)
@@ -116,6 +133,8 @@ class ChatApplication {
 
         this.elements.messageInput.addEventListener('input', (e) => {
             this.toggleSendButton(e.target.value.trim());
+            // Tự động chuyển đổi emoji text sang Unicode khi gõ
+            this.autoConvertEmojis(e.target);
         });
 
         if (this.elements.themeToggle) {
@@ -1498,8 +1517,9 @@ class ChatApplication {
                 type: chatType
             };
 
-            if (memberIds) {
-                payload.member_ids = memberIds;
+            // Gửi member_ids nếu là group và có nhập ID thành viên
+            if (chatType === 'group' && memberIds) {
+                payload.member_ids = memberIds; // chuỗi "2,3,4"
             }
 
             console.log('📤 Payload gửi lên server:', payload);
@@ -1742,6 +1762,85 @@ class ChatApplication {
 
     /**
      * ============================================
+     * HÀM autoConvertEmojis: TỰ ĐỘNG CHUYỂN ĐỔI EMOJI TEXT
+     * ============================================
+     * 
+     * CHỨC NĂNG:
+     * - Gọi API backend để sử dụng EmojiDecorator.php
+     * - Chạy real-time khi user gõ vào ô input
+     * - Đảm bảo sử dụng đúng file EmojiDecorator.php
+     * 
+     * LOGIC:
+     * - Debounce 500ms để tránh spam API
+     * - Chỉ gọi API khi phát hiện emoji text (:, ;, B)
+     * - Gửi POST request đến /index.php?controller=chat&action=convertEmoji
+     * - Nhận kết quả và cập nhật input
+     * 
+     * @param {HTMLInputElement} input - Ô input tin nhắn
+     */
+    autoConvertEmojis(input) {
+        const value = input.value;
+        
+        // Kiểm tra xem có emoji text không (chứa :, ;, hoặc B)
+        if (!value.match(/[:;B]/)) {
+            return; // Không có emoji text, bỏ qua
+        }
+        
+        // Debounce: Chờ 500ms sau khi user ngừng gõ mới gọi API
+        clearTimeout(this.emojiConvertTimeout);
+        
+        this.emojiConvertTimeout = setTimeout(async () => {
+            try {
+                const cursorPos = input.selectionStart;
+                const originalValue = input.value;
+                
+                // ============================================
+                // GỊI API ĐỂ SỬ DỤNG EmojiDecorator.php
+                // ============================================
+                const response = await fetch(
+                    `${window.URLROOT}/index.php?controller=chat&action=convertEmoji`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            content: originalValue
+                        })
+                    }
+                );
+                
+                if (!response.ok) {
+                    console.warn('⚠️ Không thể chuyển đổi emoji:', response.status);
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data) {
+                    const convertedValue = result.data.converted;
+                    
+                    // Nếu có thay đổi, cập nhật input
+                    if (convertedValue !== originalValue) {
+                        const diff = convertedValue.length - originalValue.length;
+                        input.value = convertedValue;
+                        
+                        // Điều chỉnh vị trí con trỏ
+                        const newCursorPos = cursorPos + diff;
+                        input.selectionStart = input.selectionEnd = Math.max(0, newCursorPos);
+                        
+                        console.log('✅ Chuyển đổi emoji thành công (sử dụng EmojiDecorator.php)');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ Lỗi khi chuyển đổi emoji:', error);
+            }
+        }, 500); // Debounce 500ms
+    }
+
+    /**
+     * ============================================
      * SHORT POLLING - BẮT ĐẦU
      * ============================================
      * 
@@ -1820,7 +1919,7 @@ class ChatApplication {
         
         try {
             // Gọi API với last_id để chỉ lấy tin nhắn mới hơn
-            const url = `${window.URLROOT}/index.php?controller=chat&action=getNewMessages&room_id=${this.roomId}&last_id=${this.lastMessageId}`;
+            const url = `${window.URLROOT}/index.php?controller=chat&action=getNewMessages&room_id=${this.roomId}&last_id=${this.lastMessageId}&user_id=${this.currentUserId}`;
             const response = await fetch(url);
             
             // EDGE CASE 3: Kiểm tra HTTP status

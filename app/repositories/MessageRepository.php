@@ -94,73 +94,68 @@ class MessageRepository
      * @throws \InvalidArgumentException Nếu tham số không hợp lệ
      * @throws \RuntimeException Nếu query thất bại
      */
-    public function getMessagesByRoom(int $roomId, int $limit = 50): array 
+    /**
+     * Đúng tên theo yêu cầu cô: findByRoom()
+     * Trả về array of TextMessage/FileMessage objects
+     */
+    public function findByRoom(int $roomId, int $limit = 50): array
     {
         try {
-            // Validate input
             if ($roomId <= 0) {
                 throw new \InvalidArgumentException('Room ID phải lớn hơn 0');
             }
-
             if ($limit <= 0 || $limit > 1000) {
                 throw new \InvalidArgumentException('Limit phải trong khoảng 1-1000');
             }
 
-            $this->log('GET_MESSAGES_START', "roomId={$roomId}, limit={$limit}");
+            $this->log('FIND_BY_ROOM_START', "roomId={$roomId}, limit={$limit}");
 
-            // Chuẩn bị SQL query với JOIN
-            // JOIN với bảng users để lấy username
-            // Lưu ý: Bảng phòng là chat_rooms, không phải rooms
-            $sql = "SELECT m.*, u.username 
-                    FROM messages m 
-                    JOIN users u ON m.sender_id = u.id 
-                    WHERE m.room_id = :room_id 
-                    ORDER BY m.sent_at ASC 
+            $sql = "SELECT m.*, u.username
+                    FROM messages m
+                    JOIN users u ON m.sender_id = u.id
+                    WHERE m.room_id = :room_id
+                    ORDER BY m.sent_at ASC
                     LIMIT :limit";
-            
-            // Prepare statement (chống SQL Injection)
+
             $stmt = $this->db->prepare($sql);
-            
-            if ($stmt === false) {
-                $errorInfo = $this->db->errorInfo();
-                throw new \RuntimeException(
-                    'Không thể prepare query: ' . json_encode($errorInfo)
-                );
-            }
-
-            // Bind parameters với kiểu dữ liệu cụ thể
             $stmt->bindValue(':room_id', $roomId, PDO::PARAM_INT);
-            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':limit',   $limit,  PDO::PARAM_INT);
+            $stmt->execute();
 
-            // Execute query
-            $executed = $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            if (!$executed) {
-                $errorInfo = $stmt->errorInfo();
-                throw new \RuntimeException(
-                    'Không thể execute query: ' . json_encode($errorInfo)
-                );
+            // Chuyển raw array → TextMessage / FileMessage objects
+            $messages = [];
+            foreach ($rows as $row) {
+                $sender  = new User((int)$row['sender_id'], $row['username']);
+                $sentAt  = new DateTime($row['sent_at']);
+
+                if ($row['type'] === 'text') {
+                    $messages[] = new TextMessage((int)$row['id'], $sender, $row['content'], $sentAt);
+                } else {
+                    $messages[] = new FileMessage((int)$row['id'], $sender, $row['content'], $row['type'], $sentAt);
+                }
             }
-            
-            // Fetch tất cả kết quả
-            $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            $this->log('GET_MESSAGES_SUCCESS', 'Lấy được ' . count($messages) . ' tin nhắn');
-            
+
+            $this->log('FIND_BY_ROOM_SUCCESS', 'Lấy được ' . count($messages) . ' tin nhắn');
             return $messages;
 
         } catch (\InvalidArgumentException $e) {
-            // Re-throw validation error
-            $this->log('GET_MESSAGES_VALIDATION_ERROR', $e->getMessage());
+            $this->log('FIND_BY_ROOM_VALIDATION_ERROR', $e->getMessage());
             throw $e;
-
         } catch (\Throwable $e) {
-            // Log và throw runtime error
-            $this->log('GET_MESSAGES_ERROR', $e->getMessage());
-            throw new \RuntimeException(
-                'getMessagesByRoom() thất bại: ' . $e->getMessage()
-            );
+            $this->log('FIND_BY_ROOM_ERROR', $e->getMessage());
+            throw new \RuntimeException('findByRoom() thất bại: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Giữ lại getMessagesByRoom() để không làm vỡ các chỗ khác đang gọi
+     * Gọi lại findByRoom() bên trong
+     */
+    public function getMessagesByRoom(int $roomId, int $limit = 50): array
+    {
+        return $this->findByRoom($roomId, $limit);
     }
 
     /**
@@ -443,6 +438,32 @@ class MessageRepository
      * @return bool True nếu thành công, False nếu thất bại
      * @throws \InvalidArgumentException Nếu tham số không hợp lệ
      * @throws \RuntimeException Nếu query thất bại
+     */
+    /**
+     * Đúng tên theo yêu cầu cô: markAsRead()
+     */
+    public function markAsRead(int $msgId, int $userId): void
+    {
+        try {
+            if ($msgId <= 0 || $userId <= 0) {
+                throw new \InvalidArgumentException('msgId và userId phải lớn hơn 0');
+            }
+
+            $sql = "UPDATE messages SET is_read = 1 WHERE id = :msg_id AND sender_id != :user_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':msg_id',  $msgId,  PDO::PARAM_INT);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $this->log('MARK_AS_READ', "msgId={$msgId}, userId={$userId}");
+        } catch (\Throwable $e) {
+            $this->log('MARK_AS_READ_ERROR', $e->getMessage());
+            throw new \RuntimeException('markAsRead() thất bại: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Giữ lại markRoomAsRead() để không làm vỡ các chỗ khác đang gọi
      */
     public function markRoomAsRead(int $roomId, int $currentUserId): bool
     {
