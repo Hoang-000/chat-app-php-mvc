@@ -1,0 +1,55 @@
+/* ==================== EMOJI SIDE PANEL ==================== */
+.emoji-side-panel {
+    display: none; /* ẨN HOÀN TOÀN - Không hiển thị trên màn hình */
+    width: 60px;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border-color);
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+.emoji-panel-header {
+    font-size: 24px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.emoji-panel-header:hover {
+    color: var(--accent-color);
+    transform: scale(1.1);
+}
+
+.emoji-panel-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    padding: 0 8px;
+}
+
+.emoji-panel-item {
+    font-size: 28px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.emoji-panel-item:hover {
+    background: var(--bg-hover);
+    transform: scale(1.15);
+}
+
+/* Responsive - Ẩn panel trên mobile */
+@media (max-width: 768px) {
+    .emoji-side-panel {
+        display: none;
+    }
+}

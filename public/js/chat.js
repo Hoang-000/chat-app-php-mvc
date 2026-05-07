@@ -66,6 +66,9 @@ class ChatApplication {
             modalBody: document.getElementById('modal-body'),
             closeModalBtn: document.getElementById('close-modal-btn'),
             emojiPanelGrid: document.getElementById('emoji-panel-grid'),
+            emojiTriggerBtn: document.getElementById('emoji-trigger-btn'),
+            emojiPopup: document.getElementById('emoji-popup'),
+            emojiPopupGrid: document.getElementById('emoji-popup-grid'),
             newChatBtn: document.getElementById('new-chat-btn'),
             newChatModal: document.getElementById('new-chat-modal'),
             newChatForm: document.getElementById('new-chat-form'),
@@ -272,6 +275,39 @@ class ChatApplication {
                     this.insertEmojiFromPanel(e.target.textContent);
                 }
             });
+        }
+        
+        // EMOJI POPUP - LOGIC CHO NÚT TRIGGER
+        if (this.elements.emojiTriggerBtn && this.elements.emojiPopup) {
+            console.log('✅ Emoji trigger button found:', this.elements.emojiTriggerBtn);
+            console.log('✅ Emoji popup found:', this.elements.emojiPopup);
+            
+            this.renderEmojiPopup();
+            
+            this.elements.emojiTriggerBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🎯 Emoji button clicked!');
+                this.toggleEmojiPopup();
+            });
+            
+            this.elements.emojiPopupGrid.addEventListener('click', (e) => {
+                if (e.target.classList.contains('emoji-item')) {
+                    console.log('😀 Emoji selected:', e.target.textContent);
+                    this.insertEmojiFromPopup(e.target.textContent);
+                }
+            });
+            
+            // Đóng popup khi click bên ngoài
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.emoji-popup') && !e.target.closest('.emoji-trigger-btn')) {
+                    this.hideEmojiPopup();
+                }
+            });
+        } else {
+            console.error('❌ Emoji elements not found!');
+            console.log('emojiTriggerBtn:', this.elements.emojiTriggerBtn);
+            console.log('emojiPopup:', this.elements.emojiPopup);
         }
 
         document.addEventListener('click', (e) => {
@@ -1204,6 +1240,62 @@ class ChatApplication {
         input.value += emoji;
         input.focus();
         this.toggleSendButton(input.value.trim());
+    }
+    
+    // ==================== EMOJI POPUP - LOGIC CHO NÚT TRIGGER ====================
+    renderEmojiPopup() {
+        if (!this.elements.emojiPopupGrid) return;
+        
+        const emojis = [
+            '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣',
+            '😊', '😇', '🙂', '😉', '😍', '🥰', '😘', '😚',
+            '😋', '😛', '🤔', '🤨', '😎', '🤩', '😏', '😒',
+            '😞', '😔', '😢', '😭', '😤', '😠', '😡', '🤬',
+            '😱', '😨', '😰', '🥺', '😥', '🤗', '🤭', '🥱',
+            '😴', '😪', '😷', '🤒', '🤕', '🤠', '👍', '👎',
+            '👏', '🙌', '🙏', '💪', '❤️', '💔', '💕', '💞',
+            '💜', '💛', '💯', '🔥', '✨', '🎉', '🎊', '🎁',
+            '🏆', '⭐', '🌟', '💥', '💨', '💦', '🚀', '🌈'
+        ];
+        
+        this.elements.emojiPopupGrid.innerHTML = emojis.map(emoji => 
+            `<span class="emoji-item">${emoji}</span>`
+        ).join('');
+    }
+    
+    toggleEmojiPopup() {
+        if (!this.elements.emojiPopup) {
+            console.error('❌ emojiPopup element not found!');
+            return;
+        }
+        
+        const isShowing = this.elements.emojiPopup.classList.contains('show');
+        console.log('🔄 Toggle emoji popup. Current state:', isShowing ? 'showing' : 'hidden');
+        
+        this.elements.emojiPopup.classList.toggle('show');
+        
+        console.log('🔄 New state:', this.elements.emojiPopup.classList.contains('show') ? 'showing' : 'hidden');
+    }
+    
+    hideEmojiPopup() {
+        if (!this.elements.emojiPopup) return;
+        this.elements.emojiPopup.classList.remove('show');
+    }
+    
+    insertEmojiFromPopup(emoji) {
+        const input = this.elements.messageInput;
+        if (!input) return;
+        
+        const cursorPos = input.selectionStart;
+        const textBefore = input.value.substring(0, cursorPos);
+        const textAfter = input.value.substring(cursorPos);
+        
+        input.value = textBefore + emoji + textAfter;
+        input.selectionStart = input.selectionEnd = cursorPos + emoji.length;
+        input.focus();
+        
+        this.toggleSendButton(input.value.trim());
+        this.hideEmojiPopup();
     }
     
     handleMentionAutocomplete(e) {

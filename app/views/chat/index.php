@@ -219,12 +219,23 @@ $emojiList = $data['emojiList'] ?? [];
                         <button type="button" class="attach-btn" id="file-attach-btn" title="Gửi tệp">
                             <i class="fas fa-paperclip"></i>
                         </button>
+                        <button type="button" class="attach-btn emoji-trigger-btn" id="emoji-trigger-btn" title="Chọn emoji">
+                            <i class="far fa-smile"></i>
+                        </button>
                     </div>
                     
                     <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
                     <button type="submit" class="send-btn" id="send-btn">
                         <i class="fas fa-paper-plane"></i>
                     </button>
+                    
+                    <!-- Emoji Popup -->
+                    <div class="emoji-popup" id="emoji-popup">
+                        <div class="emoji-popup-header">
+                            <i class="far fa-smile"></i> Chọn emoji
+                        </div>
+                        <div class="emoji-popup-grid" id="emoji-popup-grid"></div>
+                    </div>
                 </form>
             </div>
         </main>

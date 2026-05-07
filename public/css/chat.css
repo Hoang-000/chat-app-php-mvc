@@ -678,6 +678,7 @@ body {
     gap: 12px;
     border: 1px solid transparent;
     transition: all 0.2s ease;
+    position: relative; /* QUAN TRỌNG: Để emoji popup hiển thị đúng vị trí */
 }
 
 .message-form:focus-within {
@@ -2267,6 +2268,106 @@ select.form-control option {
 }
 
 
-/* ==================== EMOJI SIDE PANEL - BÊN NGOÀI CHAT AREA ==================== */
-/* ==================== EMOJI BUTTON POPUP ==================== */\n.emoji-trigger-btn {\n    background: transparent;\n    border: none;\n    color: var(--text-secondary);\n    font-size: 20px;\n    cursor: pointer;\n    padding: 8px;\n    border-radius: 8px;\n    transition: all 0.2s ease;\n}\n\n.emoji-trigger-btn:hover {\n    color: var(--accent-color);\n    background: var(--bg-hover);\n}\n\n.emoji-popup {\n    position: absolute;\n    bottom: 100%;\n    left: 50px;\n    margin-bottom: 10px;\n    background: var(--bg-secondary);\n    border: 1px solid var(--border-color);\n    border-radius: 12px;\n    width: 320px;\n    max-height: 350px;\n    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);\n    display: none;\n    flex-direction: column;\n    z-index: 1000;\n}\n\n.emoji-popup.show {\n    display: flex;\n}\n\n.emoji-popup-header {\n    padding: 12px 16px;\n    border-bottom: 1px solid var(--border-color);\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--text-primary);\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n\n.emoji-popup-grid {\n    display: grid;\n    grid-template-columns: repeat(8, 1fr);\n    gap: 4px;\n    padding: 12px;\n    overflow-y: auto;\n    max-height: 280px;\n}\n\n.emoji-popup-grid::-webkit-scrollbar {\n    width: 6px;\n}\n\n.emoji-popup-grid::-webkit-scrollbar-thumb {\n    background: var(--scrollbar-thumb);\n    border-radius: 3px;\n}\n\n.emoji-popup-grid .emoji-item {\n    font-size: 24px;\n    cursor: pointer;\n    padding: 8px;\n    border-radius: 8px;\n    text-align: center;\n    transition: all 0.2s ease;\n    user-select: none;\n}\n\n.emoji-popup-grid .emoji-item:hover {\n    background: var(--bg-hover);\n    transform: scale(1.2);\n}\n\n@media (max-width: 768px) {\n    .emoji-popup {\n        width: 280px;\n        left: 10px;\n    }\n    .emoji-popup-grid {\n        grid-template-columns: repeat(6, 1fr);\n    }\n}
+/* ==================== EMOJI BUTTON POPUP ==================== */
+.emoji-trigger-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.emoji-trigger-btn:hover {
+    color: var(--accent-color);
+    background: var(--bg-hover);
+}
+
+.emoji-popup {
+    position: absolute;
+    bottom: 100%;
+    left: 10px; /* Hiển thị bên TRÁI */
+    margin-bottom: 10px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    width: 320px;
+    max-height: 350px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.emoji-popup.show {
+    display: flex;
+    animation: slideUpFade 0.2s ease;
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.emoji-popup-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.emoji-popup-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    padding: 12px;
+    overflow-y: auto;
+    max-height: 280px;
+}
+
+.emoji-popup-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.emoji-popup-grid::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 3px;
+}
+
+.emoji-popup-grid .emoji-item {
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.emoji-popup-grid .emoji-item:hover {
+    background: var(--bg-hover);
+    transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+    .emoji-popup {
+        width: 280px;
+        left: 10px;
+    }
+    .emoji-popup-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
 
