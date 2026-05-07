@@ -1,0 +1,228 @@
+[2026-05-07 03:36:35] [MessageRepository] REPO_INIT: MessageRepository đang khởi tạo...
+[2026-05-07 03:36:35] [MessageRepository] REPO_INIT_SUCCESS: Database đã kết nối thành công
+[2026-05-07 03:36:35] [RoomRepository] ROOM_REPO_INIT: RoomRepository đang khởi tạo...
+[2026-05-07 03:36:35] [RoomRepository] ROOM_REPO_INIT_SUCCESS: Database đã kết nối thành công
+[2026-05-07 03:36:35] [ChatController] CONTROLLER_INIT: ChatController đã được khởi tạo
+[2026-05-07 03:36:35] [ChatController] GET_NEW_MESSAGES_REQUEST: roomId=25, lastId=215, userId=1
+[2026-05-07 03:36:35] [MessageRepository] GET_NEW_MESSAGES_START: roomId=25, lastId=215
+[2026-05-07 03:36:35] [MessageRepository] GET_NEW_MESSAGES_SUCCESS: Lấy được 0 tin nhắn mới
+[2026-05-07 03:36:35] [ChatController] GET_NEW_MESSAGES_RESULT: Lấy được 0 tin nhắn mới
+[2026-05-07 03:36:35] [MessageRepository] REPO_INIT: MessageRepository đang khởi tạo...
+[2026-05-07 03:36:35] [MessageRepository] REPO_INIT_SUCCESS: Database đã kết nối thành công
+[2026-05-07 03:36:35] [RoomRepository] ROOM_REPO_INIT: RoomRepository đang khởi tạo...
+[2026-05-07 03:36:35] [RoomRepository] ROOM_REPO_INIT_SUCCESS: Database đã kết nối thành công
+[2026-05-07 03:36:35] [ChatController] CONTROLLER_INIT: ChatController đã được khởi tạo
+[2026-05-07 03:36:35] [ChatController] ACTION_START: Bắt đầu xử lý action index()
+[2026-05-07 03:36:35] [ChatController] USER_IDENTIFIED: Current User ID: 1
+[2026-05-07 03:36:35] [ChatController] ROOM_SELECTED: Room ID: 25
+[2026-05-07 03:36:35] [ChatController] FILTER_TYPE: Filter: all
+[2026-05-07 03:36:35] [MessageRepository] MARK_AS_READ_START: roomId=25, userId=1
+[2026-05-07 03:36:35] [MessageRepository] MARK_AS_READ_SUCCESS: Đã đánh dấu 1 tin nhắn là đã đọc
+[2026-05-07 03:36:35] [ChatController] MARK_AS_READ: Đã đánh dấu phòng 25 là đã đọc cho user 1
+[2026-05-07 03:36:35] [RoomRepository] GET_ALL_ROOMS_START: User=1, Filter=all
+[2026-05-07 03:36:35] [RoomRepository] GET_ALL_ROOMS_SUCCESS: Lấy được 15 phòng chat
+[2026-05-07 03:36:35] [ChatController] ROOMS_LOADED: Đã load 15 phòng chat với filter: all
+[2026-05-07 03:36:35] [ChatController] ROOM_INFO: Tên phòng: TEST
+[2026-05-07 03:36:35] [MessageRepository] GET_MESSAGES_START: roomId=25, limit=50
+[2026-05-07 03:36:35] [MessageRepository] GET_MESSAGES_SUCCESS: Lấy được 50 tin nhắn
+[2026-05-07 03:36:36] [ChatController] ACTION_SUCCESS: Đã load 50 tin nhắn cho room 25
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=133 | TÔI LÀ GAY
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=133 | TÔI LÀ GAY
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=133 | TÔI LÀ GAY
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=133 | TÔI LÀ GAY
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=134 | TÔI GAY
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=134 | TÔI GAY
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=134 | TÔI GAY
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=134 | TÔI GAY
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=135 | ê
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=135 | ê
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=135 | ê
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=135 | ê
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=136 | alo
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=136 | alo
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=136 | alo
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=136 | alo
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=137 | dsdad
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=137 | dsdad
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=137 | dsdad
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=137 | dsdad
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=138 | adad
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=138 | adad
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=138 | adad
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=138 | adad
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=139 | s
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=139 | s
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=139 | s
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=139 | s
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=140 | da
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=140 | da
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=140 | da
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=140 | da
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=141 | da
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=141 | da
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=141 | da
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=141 | da
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=142 | d
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=142 | d
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=142 | d
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=142 | d
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=143 | á
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=143 | á
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=143 | á
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=143 | á
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=144 | đấ
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=144 | đấ
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=144 | đấ
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=144 | đấ
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=145 | ad
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=145 | ad
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=145 | ad
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=145 | ad
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=146 | ad
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=146 | ad
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=146 | ad
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=146 | ad
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=147 | d
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=147 | d
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=147 | d
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=147 | d
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=148 | a
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=148 | a
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=148 | a
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=148 | a
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=149 | d
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=149 | d
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=149 | d
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=149 | d
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=150 | adasdada
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=150 | adasdada
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=150 | adasdada
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=150 | adasdada
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=151 | đâ
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=151 | đâ
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=151 | đâ
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=151 | đâ
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=154 | heyeee
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=154 | heyeee
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=154 | heyeee
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=154 | heyeee
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=155 | madmamdamdam
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=155 | madmamdamdam
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=155 | madmamdamdam
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=155 | madmamdamdam
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=156 | em đẹp lắm
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=156 | em đẹp lắm
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=156 | em đẹp lắm
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=156 | em đẹp lắm
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=171 | @Tuấn_Pro
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=171 | @Tuấn_Pro
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=171 | @Tuấn_Pro
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=171 | @Tuấn_Pro
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=172 | @Dien gay
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=172 | @Dien gay
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=172 | @Dien gay
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=172 | <a href="/profile/Dien" class="mention">@Dien</a> gay
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=173 | @Phong_Dev
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=173 | @Phong_Dev
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=173 | @Phong_Dev
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=173 | <a href="/profile/Phong_Dev" class="mention">@Phong_Dev</a>
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=174 | @Tuấn_Pro  ông ơi
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=174 | @Tuấn_Pro  ông ơi
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=174 | @Tuấn_Pro  ông ơi
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=174 | @Tuấn_Pro  ông ơi
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=175 | @Dien
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=175 | @Dien
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=175 | @Dien
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=175 | <a href="/profile/Dien" class="mention">@Dien</a>
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=176 | @Dien mm
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=176 | @Dien mm
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=176 | @Dien mm
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=176 | <a href="/profile/Dien" class="mention">@Dien</a> mm
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=177 | @Minh
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=177 | @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=177 | @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=177 | <a href="/profile/Minh" class="mention">@Minh</a>
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=178 | :) @Minh
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=178 | 😊 @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=178 | 😊 @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=178 | 😊 <a href="/profile/Minh" class="mention">@Minh</a>
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=179 | ÁDADA
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=179 | ÁDADA
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=179 | ÁDADA
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=179 | ÁDADA
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=180 | @Minh
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=180 | @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=180 | @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=180 | <a href="/profile/Minh" class="mention">@Minh</a>
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=181 | @Thảo_Design áda
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=181 | @Thảo_Design áda
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=181 | @Thảo_Design áda
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=181 | @Thảo_Design áda
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=182 | @Minh
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=182 | @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=182 | @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=182 | <a href="/profile/Minh" class="mention">@Minh</a>
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=183 | @Quang
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=183 | @Quang
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=183 | @Quang
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=183 | <a href="/profile/Quang" class="mention">@Quang</a>
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=184 | uploads/1778110879_69fbd19f57c93.jpg
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=184 | uploads/1778110879_69fbd19f57c93.jpg
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=184 | uploads/1778110879_69fbd19f57c93.jpg
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=184 | uploads/1778110879_69fbd19f57c93.jpg
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=185 | uploads/1778111022_69fbd22ef29b6.png
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=185 | uploads/1778111022_69fbd22ef29b6.png
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=185 | uploads/1778111022_69fbd22ef29b6.png
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=185 | uploads/1778111022_69fbd22ef29b6.png
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=186 | :)
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=186 | 😊
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=186 | 😊
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=186 | 😊
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=187 | 🤨🤨🥳😏🥶🥱
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=187 | 🤨🤨🥳😏🥶🥱
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=187 | 🤨🤨🥳😏🥶🥱
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=187 | 🤨🤨🥳😏🥶🥱
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=188 | ;)
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=188 | 😉
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=188 | 😉
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=188 | 😉
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=189 | @Minh
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=189 | @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=189 | @Minh
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=189 | <a href="/profile/Minh" class="mention">@Minh</a>
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=190 | 😪😪😧😧😧🥵👺💀😠😠
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=190 | 😪😪😧😧😧🥵👺💀😠😠
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=190 | 😪😪😧😧😧🥵👺💀😠😠
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=190 | 😪😪😧😧😧🥵👺💀😠😠
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=199 | adada
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=199 | adada
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=199 | adada
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=199 | adada
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=200 | 😪🎉
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=200 | 😪🎉
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=200 | 😪🎉
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=200 | 😪🎉
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=201 | đâ
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=201 | đâ
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=201 | đâ
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=201 | đâ
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=202 | s
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=202 | s
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=202 | s
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=202 | s
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=203 | đâ
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=203 | đâ
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=203 | đâ
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=203 | đâ
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=204 | d
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=204 | d
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=204 | d
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=204 | d
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=205 | dd
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=205 | dd
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=205 | dd
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=205 | dd
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_START: ID=206 | adada
+[2026-05-07 03:36:36] [EmojiDecorator] DECORATION_DONE: ID=206 | adada
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_START: ID=206 | adada
+[2026-05-07 03:36:36] [MentionDecorator] DECORATION_DONE: ID=206 | adada
