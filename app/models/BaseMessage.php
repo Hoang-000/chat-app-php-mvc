@@ -7,10 +7,11 @@ abstract class BaseMessage
     public const TYPE_FILE  = 'file';
 
     protected int      $id;
-    protected BaseUser $sender;
+    protected User     $sender;
     protected DateTime $sentAt;
+    public int         $is_read = 0;
 
-    public function __construct(int $id, BaseUser $sender, ?DateTime $sentAt = null)
+    public function __construct(int $id, User $sender, ?DateTime $sentAt = null)
     {
         $this->id     = $id;
         $this->sender = $sender;
@@ -22,7 +23,7 @@ abstract class BaseMessage
         return $this->id;
     }
 
-    public function getSender(): BaseUser
+    public function getSender(): User
     {
         return $this->sender;
     }

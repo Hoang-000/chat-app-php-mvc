@@ -61,8 +61,8 @@ CREATE TABLE `messages` (
   `sender_id` int(11) NOT NULL,
   `content` text NOT NULL,
   `type` enum('text','image','file') DEFAULT 'text',
-  `sent_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `is_read` tinyint(1) DEFAULT 0
+  `is_read` tinyint(1) DEFAULT 0,
+  `sent_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -159,6 +159,20 @@ INSERT INTO `messages` (`id`, `room_id`, `sender_id`, `content`, `type`, `sent_a
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `pinned_messages`
+--
+
+CREATE TABLE `pinned_messages` (
+  `id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL,
+  `message_id` int(11) NOT NULL,
+  `pinned_by` int(11) NOT NULL,
+  `pinned_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `room_members`
 --
 
@@ -231,7 +245,18 @@ ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`),
   ADD KEY `sender_id` (`sender_id`),
   ADD KEY `room_id` (`room_id`),
-  ADD KEY `sent_at` (`sent_at`);
+  ADD KEY `sent_at` (`sent_at`),
+  ADD KEY `idx_messages_is_read` (`room_id`, `is_read`, `sender_id`);
+
+--
+-- Indexes for table `pinned_messages`
+--
+ALTER TABLE `pinned_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_room_message` (`room_id`,`message_id`),
+  ADD KEY `room_id` (`room_id`),
+  ADD KEY `message_id` (`message_id`),
+  ADD KEY `pinned_by` (`pinned_by`);
 
 --
 -- Indexes for table `room_members`
@@ -264,6 +289,12 @@ ALTER TABLE `messages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 
 --
+-- AUTO_INCREMENT for table `pinned_messages`
+--
+ALTER TABLE `pinned_messages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -279,6 +310,14 @@ ALTER TABLE `users`
 ALTER TABLE `messages`
   ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `chat_rooms` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `pinned_messages`
+--
+ALTER TABLE `pinned_messages`
+  ADD CONSTRAINT `pinned_messages_ibfk_1` FOREIGN KEY (`room_id`) REFERENCES `chat_rooms` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `pinned_messages_ibfk_2` FOREIGN KEY (`message_id`) REFERENCES `messages` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `pinned_messages_ibfk_3` FOREIGN KEY (`pinned_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `room_members`

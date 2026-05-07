@@ -5,7 +5,7 @@ class FileMessage extends BaseMessage
     private string $filePath;
     private string $fileType; // 'image' | 'file'
 
-    public function __construct(int $id, BaseUser $sender, string $filePath, string $fileType = 'file', ?DateTime $sentAt = null)
+    public function __construct(int $id, User $sender, string $filePath, string $fileType = 'file', ?DateTime $sentAt = null)
     {
         parent::__construct($id, $sender, $sentAt);
         $this->filePath = $filePath;

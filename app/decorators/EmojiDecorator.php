@@ -1,46 +1,40 @@
 <?php
-require_once __DIR__ . '/MessageDecorator.php';
 
 class EmojiDecorator implements MessageDecorator
 {
-    use LoggerTrait;
-
-    private array $emojiMap = [
-        ':)'  => '😊', ':-)'  => '😊', ':D'   => '😃', ':-D'  => '😃',
-        ':('  => '😞', ':-('  => '😞', ':P'   => '😛', ':-P'  => '😛',
-        ';)'  => '😉', ';-)'  => '😉', ':O'   => '😮', ':-O'  => '😮',
-        ':*'  => '😘', 'B)'   => '😎',
-        ':happy:'   => '🎉', ':heart:'   => '❤️', ':love:'    => '❤️',
-        ':fire:'    => '🔥', ':star:'    => '⭐',    ':thumbs:'  => '👍',
-        ':ok:'      => '👍', ':clap:'    => '👏', ':sad:'     => '😢',
-        ':cry:'     => '😭', ':laugh:'   => '😂', ':smile:'   => '😊',
-        ':cool:'    => '😎', ':wave:'    => '👋', ':check:'   => '✅',
-        ':cross:'   => '❌',    ':warning:' => '⚠️', ':rocket:'  => '🚀',
-        ':cake:'    => '🎂', ':gift:'    => '🎁',
-    ];
+    private array $emojiMap;
 
     public function __construct()
     {
-        $this->initLogger();
+        $this->emojiMap = [
+            ':)'  => '😊', ':-)'  => '😊', ':D'   => '😃', ':-D'  => '😃',
+            ':('  => '😞', ':-('  => '😞', ':P'   => '😛', ':-P'  => '😛',
+            ';)'  => '😉', ';-)'  => '😉', ':O'   => '😮', ':-O'  => '😮',
+            ':*'  => '😘', 'B)'   => '😎',
+            ':happy:'   => '🎉', ':heart:'   => '❤️', ':love:'    => '❤️',
+            ':fire:'    => '🔥', ':star:'    => '⭐', ':thumbs:'  => '👍',
+            ':ok:'      => '👍', ':clap:'    => '👏', ':sad:'     => '😢',
+            ':cry:'     => '😭', ':laugh:'   => '😂', ':smile:'   => '😊',
+            ':cool:'    => '😎', ':wave:'    => '👋', ':check:'   => '✅',
+            ':cross:'   => '❌', ':warning:' => '⚠️', ':rocket:'  => '🚀',
+            ':cake:'    => '🎂', ':gift:'    => '🎁',
+        ];
+        // Sort theo độ dài giảm dần để tránh conflict (:-) vs :))
+        uksort($this->emojiMap, fn($a, $b) => strlen($b) - strlen($a));
     }
 
-    /**
-     * Thực hiện decorate: chuyển ký hiệu emoji thành unicode
-     */
     public function decorate(BaseMessage $msg): string
     {
         $content = $msg->getContent();
-        $this->log('EMOJI_START', "ID={$msg->getId()} | {$content}");
-
-        $converted = $this->convertEmojis($content);
-
-        $this->log('EMOJI_DONE', "ID={$msg->getId()} | {$converted}");
-        return $converted;
+        return str_replace(array_keys($this->emojiMap), array_values($this->emojiMap), $content);
     }
 
-    private function convertEmojis(string $content): string
+    /**
+     * Lấy danh sách emoji để render picker UI
+     * @return array ['shortcode' => 'emoji']
+     */
+    public function getEmojiList(): array
     {
-        uksort($this->emojiMap, fn($a, $b) => strlen($b) - strlen($a));
-        return str_replace(array_keys($this->emojiMap), array_values($this->emojiMap), $content);
+        return $this->emojiMap;
     }
 }

@@ -5,12 +5,12 @@ class ChatRoom
     private array $members  = [];
     private array $messages = [];
 
-    public function join(BaseUser $user): void
+    public function join(User $user): void
     {
         $this->members[$user->getId()] = $user;
     }
 
-    public function leave(BaseUser $user): void
+    public function leave(User $user): void
     {
         unset($this->members[$user->getId()]);
     }

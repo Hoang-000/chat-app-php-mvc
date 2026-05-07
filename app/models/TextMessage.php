@@ -4,7 +4,7 @@ class TextMessage extends BaseMessage
 {
     private string $text;
 
-    public function __construct(int $id, BaseUser $sender, string $text, ?DateTime $sentAt = null)
+    public function __construct(int $id, User $sender, string $text, ?DateTime $sentAt = null)
     {
         parent::__construct($id, $sender, $sentAt);
         $this->text = $text;

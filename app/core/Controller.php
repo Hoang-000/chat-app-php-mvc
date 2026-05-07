@@ -8,6 +8,14 @@
  */
 class Controller
 {
+    public function __construct()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Middleware đã được xử lý ở index.php, không cần kiểm tra lại ở đây
+    }
     /**
      * Render một view và truyền dữ liệu xuống template.
      *

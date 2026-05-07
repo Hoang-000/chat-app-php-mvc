@@ -1,5 +1,6 @@
 <?php
 $currentUserId = $data['currentUserId'] ?? 1;
+$emojiList = $data['emojiList'] ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -12,6 +13,7 @@ $currentUserId = $data['currentUserId'] ?? 1;
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="<?= $data['URLROOT'] ?>/css/chat.css">
+    <link rel="stylesheet" href="<?= $data['URLROOT'] ?>/css/emoji-panel.css">
 </head>
 <body>
     <div class="app-container">
@@ -26,9 +28,9 @@ $currentUserId = $data['currentUserId'] ?? 1;
                     <button class="icon-btn" id="new-chat-btn" title="Tạo cuộc trò chuyện mới">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="icon-btn" title="Thêm tùy chọn">
-                        <i class="fas fa-ellipsis-h"></i>
-                    </button>
+                    <a href="index.php?controller=user&action=logout" class="icon-btn" title="Đăng xuất" style="text-decoration: none; color: inherit;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
                 </div>
             </div>
             <div class="search-container">
@@ -43,36 +45,23 @@ $currentUserId = $data['currentUserId'] ?? 1;
                 <button class="chip" data-filter="groups">Groups</button>
             </div>
             
-            <!-- DANH SÁCH PHÒNG CHAT ĐỘNG -->
+            <!-- Room List -->
             <div class="room-list-container" id="room-list-container">
                 <?php if (!empty($data['rooms'])): ?>
                     <?php foreach ($data['rooms'] as $room): ?>
                         <?php 
-                        // Kiểm tra phòng hiện tại để thêm class 'active'
                         $isActive = ($room['room_id'] == $data['roomId']);
                         $activeClass = $isActive ? 'active' : '';
-                        
-                        // Xác định loại phòng (group hoặc private)
                         $roomTypeClass = ($room['room_type'] === 'group') ? 'group' : 'private';
-                        
-                        // Lấy chữ cái đầu của tên phòng làm avatar
                         $avatarLetter = $room['avatar_letter'] ?? 'R';
-                        
-                        // ============================================
-                        // FIX LỖI "F5 MẤT TRẠNG THÁI GHIM"
-                        // ============================================
-                        // Kiểm tra trạng thái ghim từ dữ liệu PHP
                         $isPinned = isset($room['is_pinned']) && ((int)$room['is_pinned'] === 1);
-                        
-                        // Hiển thị icon ghim nếu phòng được ghim
-                        $pinIcon = $isPinned ? '<i class="fas fa-thumbtack" style="color: var(--accent-color); margin-left: 6px; font-size: 12px;"></i>' : '';
-                        
-                        // Text cho dropdown menu
+                        $pinIcon = $isPinned ? '<i class="fas fa-thumbtack pin-icon"></i>' : '';
                         $pinText = $isPinned ? 'Bỏ ghim' : 'Ghim đoạn chat';
                         ?>
                         <div class="room-item <?= $activeClass ?> <?= $roomTypeClass ?>" 
                              data-room-id="<?= $room['room_id'] ?>" 
                              data-room-name="<?= htmlspecialchars($room['room_name_display']) ?>"
+                             data-room-type="<?= $room['room_type'] ?>"
                              data-is-pinned="<?= $isPinned ? '1' : '0' ?>">
                             <div class="room-avatar"><?= htmlspecialchars($avatarLetter) ?></div>
                             <div class="room-info">
@@ -100,15 +89,22 @@ $currentUserId = $data['currentUserId'] ?? 1;
                                     <i class="fas fa-thumbtack"></i>
                                     <span><?= $pinText ?></span>
                                 </div>
-                                <div class="dropdown-item dropdown-item-danger" data-action="delete">
-                                    <i class="fas fa-trash"></i>
-                                    <span>Xóa đoạn chat</span>
-                                </div>
+                                <?php if ($room['room_type'] === 'group'): ?>
+                                    <div class="dropdown-item dropdown-item-danger" data-action="leave">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Rời khỏi nhóm</span>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="dropdown-item dropdown-item-danger" data-action="delete">
+                                        <i class="fas fa-trash"></i>
+                                        <span>Xóa đoạn chat</span>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="empty-state" style="padding: 40px 20px;">
+                    <div class="empty-state">
                         <i class="fas fa-inbox"></i>
                         <p>Chưa có phòng chat nào</p>
                     </div>
@@ -124,7 +120,12 @@ $currentUserId = $data['currentUserId'] ?? 1;
                 </button>
                 <div class="chat-header-info">
                     <h2 id="chat-room-name"><?= htmlspecialchars($data['title'] ?? 'Chat Room') ?></h2>
-                    <p id="chat-room-subtitle"><?= count($data['messages']) ?> tin nhắn</p>
+                    <p id="chat-room-subtitle">
+                        <?php if (isset($data['memberCount']) && $data['memberCount'] > 0): ?>
+                            <i class="fas fa-users"></i> <?= $data['memberCount'] ?> thành viên • 
+                        <?php endif; ?>
+                        <?= count($data['messages']) ?> tin nhắn
+                    </p>
                 </div>
                 <div class="chat-header-actions">
                     <button class="icon-btn" title="Ghim tin nhắn">
@@ -150,7 +151,7 @@ $currentUserId = $data['currentUserId'] ?? 1;
                 </button>
             </div>
 
-            <!-- KHU VỰC TIN NHẮN -->
+            <!-- Messages Container -->
             <div class="messages-container" id="messages-container">
                 <?php if (empty($data['messages'])): ?>
                     <div class="empty-state">
@@ -160,10 +161,10 @@ $currentUserId = $data['currentUserId'] ?? 1;
                 <?php else: ?>
                     <?php foreach ($data['messages'] as $msg): ?>
                         <?php
-                        $isMyMessage  = ((int)$msg['sender_id'] === (int)$currentUserId);
+                        $isMyMessage = ((int)$msg['sender_id'] === (int)$currentUserId);
                         $messageClass = $isMyMessage ? 'my-message' : 'other-message';
-                        $messageType  = $msg['type'] ?? 'text';
-                        $senderName   = $isMyMessage ? 'You' : ($msg['username'] ?? 'User #' . $msg['sender_id']);
+                        $messageType = $msg['type'] ?? 'text';
+                        $senderName = $isMyMessage ? 'You' : ($msg['username'] ?? 'User #' . $msg['sender_id']);
                         ?>
                         <div class="message-wrapper <?= $messageClass ?>" data-message-id="<?= $msg['id'] ?>" data-user-id="<?= $msg['sender_id'] ?>">
                             <div class="message-avatar"><?= htmlspecialchars(mb_substr($senderName, 0, 1)) ?></div>
@@ -172,7 +173,7 @@ $currentUserId = $data['currentUserId'] ?? 1;
                                 <div class="message-bubble">
                                     <div class="message-text">
                                         <?php if ($messageType === 'image'): ?>
-                                            <img src="<?= $data['URLROOT'] ?>/<?= htmlspecialchars($msg['content']) ?>" style="max-width: 200px; border-radius: 8px; margin: 5px 0;" alt="Image">
+                                            <img src="<?= $data['URLROOT'] ?>/<?= htmlspecialchars($msg['content']) ?>" class="message-image" alt="Image" width="220" height="220" loading="lazy">
                                         <?php elseif ($messageType === 'file'): ?>
                                             <?php $fileName = basename($msg['content']); ?>
                                             <a href="<?= $data['URLROOT'] ?>/<?= htmlspecialchars($msg['content']) ?>" target="_blank" class="message-file">
@@ -184,6 +185,16 @@ $currentUserId = $data['currentUserId'] ?? 1;
                                     </div>
                                     <div class="message-time">
                                         <?= htmlspecialchars($msg['sent_at']) ?>
+                                        <?php if ($isMyMessage): ?>
+                                            <?php 
+                                            $isRead = isset($msg['is_read']) && ($msg['is_read'] == 1 || $msg['is_read'] === true);
+                                            ?>
+                                            <?php if ($isRead): ?>
+                                                <i class="fas fa-check-double" style="color: #10b981; margin-left: 4px;" title="Đã xem"></i>
+                                            <?php else: ?>
+                                                <i class="fas fa-check" style="color: var(--text-muted); margin-left: 4px;" title="Đã gửi"></i>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -192,19 +203,16 @@ $currentUserId = $data['currentUserId'] ?? 1;
                 <?php endif; ?>
             </div>
 
-            <!-- FORM NHẬP TIN NHẮN -->
+            <!-- Message Input -->
             <div class="message-input-container">
                 <form class="message-form" id="message-form">
                     <input type="hidden" id="room-id" value="<?= $data['roomId'] ?? 1 ?>">
                     <input type="file" id="file-input" accept="*/*" multiple style="display: none;">
                     <input type="file" id="image-input" accept="image/*" multiple style="display: none;">
                     
-                    <div id="attachment-preview" class="attachment-preview-container" style="display: none; padding: 10px; border-top: 1px solid var(--border-color); gap: 10px; overflow-x: auto;"></div>
+                    <div id="attachment-preview" class="attachment-preview-container" style="display: none;"></div>
                     
                     <div class="attach-buttons">
-                        <button type="button" class="attach-btn" id="emoji-btn" title="Emoji">
-                            <i class="fas fa-smile"></i>
-                        </button>
                         <button type="button" class="attach-btn" id="image-attach-btn" title="Gửi ảnh">
                             <i class="fas fa-image"></i>
                         </button>
@@ -212,37 +220,25 @@ $currentUserId = $data['currentUserId'] ?? 1;
                             <i class="fas fa-paperclip"></i>
                         </button>
                     </div>
-                    <input 
-                        type="text" 
-                        id="message-input" 
-                        placeholder="Type a message..." 
-                        autocomplete="off"
-                    >
+                    
+                    <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
                     <button type="submit" class="send-btn" id="send-btn">
                         <i class="fas fa-paper-plane"></i>
                     </button>
-                    
-                    <!-- EMOJI PICKER -->
-                    <div id="emoji-picker" style="display: none; position: absolute; bottom: 60px; left: 20px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 10px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="😀">😀</span>
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="😂">😂</span>
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="❤️">❤️</span>
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="👍">👍</span>
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="😢">😢</span>
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="🔥">🔥</span>
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="🎉">🎉</span>
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="💯">💯</span>
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="🙏">🙏</span>
-                            <span class="emoji-item" style="font-size: 24px; cursor: pointer; transition: transform 0.2s;" data-emoji="😍">😍</span>
-                        </div>
-                    </div>
                 </form>
             </div>
         </main>
+
+        <!-- EMOJI SIDE PANEL - BÊN NGOÀI CHAT AREA -->
+        <aside id="emoji-side-panel" class="emoji-side-panel">
+            <div class="emoji-panel-header">
+                <i class="far fa-smile"></i>
+            </div>
+            <div class="emoji-panel-grid" id="emoji-panel-grid"></div>
+        </aside>
     </div>
 
-    <!-- MODAL THÔNG TIN PHÒNG -->
+    <!-- Room Info Modal -->
     <div class="modal-overlay" id="room-info-modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -259,7 +255,7 @@ $currentUserId = $data['currentUserId'] ?? 1;
         </div>
     </div>
 
-    <!-- MODAL TẠO PHÒNG MỚI -->
+    <!-- New Chat Modal -->
     <div class="modal-overlay" id="new-chat-modal" style="display: none;">
         <div class="modal-content modal-new-chat">
             <div class="modal-header">
@@ -280,30 +276,27 @@ $currentUserId = $data['currentUserId'] ?? 1;
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="chat-name">
-                            <i class="fas fa-signature"></i> Tên phòng/người nhận
+                    <div class="form-group" id="private-user-group">
+                        <label for="private-user-select">
+                            <i class="fas fa-user"></i> Chọn người nhận
                         </label>
-                        <input 
-                            type="text" 
-                            id="chat-name" 
-                            class="form-control" 
-                            placeholder="Nhập tên nhóm hoặc tên người nhận..."
-                            required
-                        >
-                        <small class="form-hint">Ví dụ: "Nhóm dự án ABC" hoặc "Nguyễn Văn A"</small>
+                        <select id="private-user-select" class="form-control">
+                            <option value="">-- Chọn người dùng --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="group-name-group" style="display: none;">
+                        <label for="group-name">
+                            <i class="fas fa-signature"></i> Tên nhóm
+                        </label>
+                        <input type="text" id="group-name" class="form-control" placeholder="Nhập tên nhóm...">
                     </div>
 
                     <div class="form-group" id="member-ids-group" style="display: none;">
                         <label for="member-ids">
                             <i class="fas fa-users"></i> ID thành viên (tùy chọn)
                         </label>
-                        <input 
-                            type="text" 
-                            id="member-ids" 
-                            class="form-control" 
-                            placeholder="Ví dụ: 2,3,4"
-                        >
+                        <input type="text" id="member-ids" class="form-control" placeholder="Ví dụ: 2,3,4">
                         <small class="form-hint">Nhập ID người dùng cách nhau bởi dấu phẩy</small>
                     </div>
 
@@ -320,30 +313,17 @@ $currentUserId = $data['currentUserId'] ?? 1;
         </div>
     </div>
 
+    <!-- Image Zoom Modal -->
+    <div id="image-zoom-modal" class="image-zoom-modal" style="display:none;">
+        <span id="close-zoom" class="close-zoom">&times;</span>
+        <img id="zoomed-image" class="zoomed-image" alt="Zoomed Image">
+    </div>
+
     <script>
-        // Truyền URLROOT vào JavaScript
         window.URLROOT = '<?= $data['URLROOT'] ?>';
+        window.CURRENT_USER_ID = <?= $currentUserId ?>;
+        window.ROOM_TYPE = '<?= $data['roomType'] ?? 'private' ?>';
     </script>
     <script src="<?= $data['URLROOT'] ?>/js/chat.js"></script>
-    <style>
-        .emoji-item:hover {
-            transform: scale(1.3);
-        }
-    </style>
-
-    <!-- ============================================ -->
-    <!-- IMAGE ZOOM MODAL (LIGHTBOX) -->
-    <!-- ============================================ -->
-    <!-- Modal phóng to ảnh khi user click vào ảnh trong tin nhắn -->
-    <!-- Sử dụng CSS thuần, không dùng thư viện ngoài -->
-    <!-- Hiển thị ảnh ở giữa màn hình với nền đen mờ -->
-    <!-- Click vào nút X hoặc click ra ngoài ảnh để đóng -->
-    <div id="image-zoom-modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.8); align-items:center; justify-content:center; flex-direction:column;">
-        <!-- Nút đóng Modal (dấu X) -->
-        <span id="close-zoom" style="position:absolute; top:20px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer; transition: color 0.2s;" onmouseover="this.style.color='#d97706'" onmouseout="this.style.color='#f1f1f1'">&times;</span>
-        
-        <!-- Ảnh được phóng to -->
-        <img id="zoomed-image" style="max-width:90%; max-height:90%; border-radius:10px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); object-fit: contain;" alt="Zoomed Image">
-    </div>
 </body>
 </html>
